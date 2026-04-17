@@ -113,15 +113,15 @@
         "cateogry": "IKFL",
         "assets": [
             {
-                "id": "RWY_NE",
-                "name": "RWY_NE",
-                "route": "/assets/maps/IKFL/RWY_NE.svg",
+                "id": "RWY_NW",
+                "name": "RWY_NW",
+                "route": "/assets/maps/IKFL/RWY_NW.svg",
                 "defaultStyle": { "color": 16776960, "pixelLine": true, "alpha": 0.4 }
             },
             {
-                "id": "RWY_SW",
-                "name": "RWY_SW",
-                "route": "/assets/maps/IKFL/RWY_SW.svg",
+                "id": "RWY_SE",
+                "name": "RWY_SE",
+                "route": "/assets/maps/IKFL/RWY_SE.svg",
                 "defaultStyle": { "color": 16776960, "pixelLine": true, "alpha": 0.4 }
             },
             {
@@ -136,15 +136,15 @@
         "cateogry": "ITEY",
         "assets": [
             {
-                "id": "RWY_NE",
-                "name": "RWY_NE",
-                "route": "/assets/maps/ITEY/RWY_NE.svg",
+                "id": "RWY_NW",
+                "name": "RWY_NW",
+                "route": "/assets/maps/ITEY/RWY_NW.svg",
                 "defaultStyle": { "color": 16776960, "pixelLine": true, "alpha": 0.4 }
             },
             {
-                "id": "RWY_SW",
-                "name": "RWY_SW",
-                "route": "/assets/maps/ITEY/RWY_SW.svg",
+                "id": "RWY_SE",
+                "name": "RWY_SE",
+                "route": "/assets/maps/ITEY/RWY_SE.svg",
                 "defaultStyle": { "color": 16776960, "pixelLine": true, "alpha": 0.4 }
             },
             {
