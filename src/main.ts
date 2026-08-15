@@ -61,16 +61,65 @@ const antialias = false;
         try {
             const t = document.createElement('div');
             t.className = `toast ${type}`;
-            t.textContent = message;
+            const msgSpan = document.createElement('span');
+            msgSpan.textContent = message;
+            t.appendChild(msgSpan);
+        
+            const closeBtn = document.createElement('div');
+            closeBtn.className = 'toast-close';
+            closeBtn.innerHTML = '×';
+            t.appendChild(closeBtn);
+            
+            let autoTimer: number | null = null;
+            
+            function dismissToast(toast: HTMLElement, timer: number | null) {
+                if (timer !== null) clearTimeout(timer);
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+            }
+            
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dismissToast(t, autoTimer);
+            });
+                        let startX = 0, currentX = 0;
+            const onPointerDown = (e: PointerEvent) => {
+                if ((e.target as HTMLElement).classList.contains('toast-close')) return;
+                startX = e.clientX;
+                currentX = e.clientX;
+                t.classList.add('dragging');
+                t.setPointerCapture(e.pointerId);
+            };
+            const onPointerMove = (e: PointerEvent) => {
+                if (!t.classList.contains('dragging')) return;
+                currentX = e.clientX;
+                const deltaX = currentX - startX;
+                if (deltaX > 0) {
+                    t.style.transform = `translateX(${deltaX}px) scale(1) rotateZ(0deg)`;
+                    t.style.opacity = `${Math.max(0.3, 1 - deltaX / 200)}`;
+                }
+            };
+            const onPointerUp = (e: PointerEvent) => {
+                t.classList.remove('dragging');
+                const deltaX = currentX - startX;
+                if (deltaX > 100) {
+                    dismissToast(t, autoTimer);
+                } else {
+                    t.style.transform = '';
+                    t.style.opacity = '';
+                }
+                t.releasePointerCapture(e.pointerId);
+            };
+            t.addEventListener('pointerdown', onPointerDown);
+            t.addEventListener('pointermove', onPointerMove);
+            t.addEventListener('pointerup', onPointerUp);
+            t.addEventListener('pointercancel', onPointerUp);
+            
             toastContainer.appendChild(t);
-            // Delay adding the show class slightly so the browser
-            // registers the starting transform/opacity and animates it.
             setTimeout(() => t.classList.add('show'), 60);
-            setTimeout(() => {
-                t.classList.remove('show');
-                t.classList.add('hide');
-                t.addEventListener('transitionend', () => t.remove(), { once: true });
-            }, timeout);
+            
+            autoTimer = window.setTimeout(() => dismissToast(t, null), timeout) as unknown as number;
         } catch (e) {
         }
     }
@@ -190,14 +239,16 @@ const antialias = false;
     app.stage.on('touchstart', () => app.stage.on('pointermove', dragmap));
     app.stage.on('touchend', () => app.stage.off('pointermove', dragmap));
 
-    // Scroll wheel
     app.stage.on('wheel', e => {
-        // down scroll, zoom out
-        if (e.deltaY > 0)
-            basemap.scale.set(basemap.scale.x * 1 / 1.1);
-        // up scroll, zoom in
-        else if (e.deltaY < 0)
-            basemap.scale.set(basemap.scale.x * 1.1);
+        const mouseX = e.global.x;
+        const mouseY = e.global.y;
+        const worldX = (mouseX - basemap.position.x) / basemap.scale.x + basemap.pivot.x;
+        const worldY = (mouseY - basemap.position.y) / basemap.scale.y + basemap.pivot.y;
+        const zoomFactor = e.deltaY > 0 ? 1 / 1.1 : 1.1;
+        const newScale = basemap.scale.x * zoomFactor;
+        basemap.scale.set(newScale);
+        basemap.pivot.x = worldX - (mouseX - basemap.position.x) / newScale;
+        basemap.pivot.y = worldY - (mouseY - basemap.position.y) / newScale;
 
         positionGraphics();
     })
@@ -209,9 +260,19 @@ const antialias = false;
 
     const wsManager = createWebSocketManager(WS_URL, {
         onMessage: onWSMessage,
-        onOpen: () => showToast('WebSocket connected', 'success'),
-        onClose: () => showToast('WebSocket disconnected', 'error'),
-        onError: () => showToast('WebSocket error', 'error'),
+        onOpen: () => {
+            showToast('WebSocket Connected', 'success');
+        },
+        onClose: (ev: CloseEvent) => {
+            let msg = `Connection closed (Code: ${ev?.code || 'unknown'})`;
+            if (ev?.reason && ev.reason.trim()) {
+                msg += ` - ${ev.reason}`;
+            }
+            showToast(msg, 'error', 6000);
+        },
+        onError: () => {
+            showToast('Connection error', 'error');
+        },
     }, {
         heartbeatInterval: 15000,
         heartbeatTimeout: 30000,

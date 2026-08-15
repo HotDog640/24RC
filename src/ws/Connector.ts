@@ -1,7 +1,7 @@
 type Handlers = {
     onMessage: (ev: MessageEvent) => void;
     onOpen?: () => void;
-    onClose?: () => void;
+    onClose?: (ev: CloseEvent) => void;
     onError?: () => void;
 };
 
@@ -23,6 +23,7 @@ export default function createWebSocketManager(url: string, handlers: Handlers, 
     let heartbeatTimer: number | null = null;
     let reconnectTimer: number | null = null;
     let reconnectDelay = RECONNECT_BASE;
+    let openConfirmTimer: number | null = null;
 
     function scheduleReconnect() {
         if (reconnectTimer) return;
@@ -72,13 +73,31 @@ export default function createWebSocketManager(url: string, handlers: Handlers, 
         ws.onopen = () => {
             reconnectDelay = RECONNECT_BASE;
             lastMessageAt = Date.now();
-            handlers.onOpen && handlers.onOpen();
+            if (openConfirmTimer) clearTimeout(openConfirmTimer);
+            openConfirmTimer = window.setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    handlers.onOpen && handlers.onOpen();
+                }
+                openConfirmTimer = null;
+            }, 500) as unknown as number;
             if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
         };
 
-        ws.onclose = () => {
-            handlers.onClose && handlers.onClose();
-            scheduleReconnect();
+        ws.onclose = (ev: CloseEvent) => {
+            if (openConfirmTimer) {
+                clearTimeout(openConfirmTimer);
+                openConfirmTimer = null;
+            }
+            handlers.onClose && handlers.onClose(ev);
+            if (ev && ev.code === 1008) {
+                if (reconnectTimer) return;
+                reconnectTimer = window.setTimeout(() => {
+                    reconnectTimer = null;
+                    connect();
+                }, 10000) as unknown as number;
+            } else {
+                scheduleReconnect();
+            }
         };
 
         ws.onerror = () => {

@@ -18,7 +18,7 @@ body {
     line-height: 48pt;
 
     font-size: 48pt;
-    color:white;
+    color: white;
     text-decoration: none;
     text-align: center;
 
@@ -34,8 +34,8 @@ body {
     position: fixed;
     left: 10px;
     bottom: 10px;
-    
-    color:white;
+
+    color: white;
     opacity: 50%;
     text-decoration: none;
 }
@@ -43,7 +43,7 @@ body {
 #parent {
     display: flex;
     flex-direction: column;
-    height:100vh;
+    height: 100vh;
     width: 100vw;
 }
 
@@ -62,12 +62,12 @@ body {
 }
 
 /* full height buttons */
-#dcb > div {
+#dcb>div {
     height: 76px;
 }
 
 /* half height buttons */
-#dcb > div > div {
+#dcb>div>div {
     height: 36px;
 }
 
@@ -80,11 +80,11 @@ body {
     background-color: #002C00;
 
     padding: 0 5px 0 5px;
-    
+
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    
+
     font-size: 10pt;
     color: #eee;
     text-align: center;
@@ -126,42 +126,195 @@ body {
 
 .toast-container {
     position: fixed;
-    top: 16px;
-    right: 16px;
+    top: 20px;
+    right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     z-index: 9999;
     pointer-events: none;
 }
+
 .toast {
-    min-width: 180px;
-    max-width: 320px;
-    background: rgba(20,20,20,0.9);
+    position: relative;
+    min-width: 260px;
+    max-width: 380px;
+    background: rgba(12, 12, 15, 0.96);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
     color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-    font-size: 13px;
-    transform: translateX(100%);
+    padding: 14px 42px 14px 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75),
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 0 1px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.5;
+    transform: translateX(120%) scale(0.88) rotateZ(2deg);
     opacity: 0;
-    transition: transform 420ms cubic-bezier(.16,.84,.32,1), opacity 420ms ease;
+    transition: all 450ms cubic-bezier(.16, .84, .32, 1);
     pointer-events: auto;
+    cursor: grab;
+    overflow: hidden;
+    user-select: none;
+    touch-action: pan-y;
 }
+
+.toast.dragging {
+    cursor: grabbing;
+    transition: none;
+}
+
+.toast-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.toast-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.95);
+    transform: scale(1.1);
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    animation: toast-progress 3.5s linear forwards;
+    border-radius: 0 0 0 12px;
+}
+
+.toast:hover {
+    transform: translateX(0) scale(1.02) rotateZ(0deg);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8),
+        0 6px 16px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
 .toast.show {
-    transform: translateX(0);
+    transform: translateX(0) scale(1) rotateZ(0deg);
     opacity: 1;
 }
+
 .toast.hide {
-    transform: translateX(100%);
+    transform: translateX(120%) scale(0.88) rotateZ(-2deg);
     opacity: 0;
 }
+
 .toast.success {
-    background: linear-gradient(90deg,#0f5132,#198754);
+    background: linear-gradient(135deg, rgba(15, 82, 50, 0.96), rgba(22, 125, 75, 0.96));
+    border-color: rgba(34, 197, 94, 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75),
+        0 4px 12px rgba(22, 125, 75, 0.45),
+        inset 0 1px 0 rgba(34, 197, 94, 0.3),
+        0 0 20px rgba(34, 197, 94, 0.15);
 }
+
+.toast.success::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12' stroke-dasharray='24' stroke-dashoffset='24'%3E%3Canimate attributeName='stroke-dashoffset' from='24' to='0' dur='1s' fill='freeze' restart='always'/%3E%3C/polyline%3E%3C/svg%3E");    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.5));
+    animation: icon-pop 0.5s cubic-bezier(.16, .84, .44, 1.56);
+}
+
+.toast.success::after {
+    background: linear-gradient(90deg, transparent, #4ade80);
+}
+
 .toast.error {
-    background: linear-gradient(90deg,#5f0d0d,#dc3545);
+    background: linear-gradient(135deg, rgba(92, 12, 12, 0.96), rgba(185, 45, 55, 0.96));
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75),
+        0 4px 12px rgba(185, 45, 55, 0.45),
+        inset 0 1px 0 rgba(239, 68, 68, 0.3),
+        0 0 20px rgba(239, 68, 68, 0.15);
 }
+
+.toast.error::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f87171' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18' stroke-dasharray='17' stroke-dashoffset='17'%3E%3Canimate attributeName='stroke-dashoffset' from='17' to='0' dur='0.8s' fill='freeze' restart='always'/%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18' stroke-dasharray='17' stroke-dashoffset='17'%3E%3Canimate attributeName='stroke-dashoffset' from='17' to='0' dur='0.8s' begin='0.3s' fill='freeze' restart='always'/%3E%3C/line%3E%3C/svg%3E");    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.5));
+    animation: icon-pop 0.5s cubic-bezier(.16, .84, .44, 1.56);
+}
+
+.toast.error::after {
+    background: linear-gradient(90deg, transparent, #f87171);
+}
+
 .toast.info {
-    background: linear-gradient(90deg,#0b3a66,#0d6efd);
+    background: linear-gradient(135deg, rgba(10, 55, 95, 0.96), rgba(12, 100, 220, 0.96));
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75),
+        0 4px 12px rgba(12, 100, 220, 0.45),
+        inset 0 1px 0 rgba(59, 130, 246, 0.3),
+        0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+.toast.info::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10' stroke-dasharray='63' stroke-dashoffset='63'%3E%3Canimate attributeName='stroke-dashoffset' from='63' to='0' dur='0.5s' fill='freeze'/%3E%3C/circle%3E%3Cline x1='12' y1='16' x2='12' y2='12' stroke-dasharray='4' stroke-dashoffset='4'%3E%3Canimate attributeName='stroke-dashoffset' from='4' to='0' dur='0.2s' begin='0.4s' fill='freeze'/%3E%3C/line%3E%3Cline x1='12' y1='8' x2='12.01' y2='8' stroke-dasharray='0.01' stroke-dashoffset='0.01'%3E%3Canimate attributeName='stroke-dashoffset' from='0.01' to='0' dur='0.1s' begin='0.5s' fill='freeze'/%3E%3C/line%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
+    animation: icon-pop 0.5s cubic-bezier(.16, .84, .44, 1.56);
+}
+
+.toast.info::after {
+    background: linear-gradient(90deg, transparent, #60a5fa);
+}
+
+@keyframes toast-progress {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+@keyframes icon-pop {
+    0% {
+        transform: translateY(-50%) scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-50%) scale(1.2) rotate(10deg);
+    }
+    100% {
+        transform: translateY(-50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
 }
